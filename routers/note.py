@@ -1,10 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
-
+from typing import List
 from database import get_db
 from models import Note
-from schemas.note import NoteCreated, NoteResponse
+from schemas.note import NoteCreated, NoteResponse, NoteUpdate
 from utils.dependencies import get_current_user
 from models.user import User
 
@@ -24,3 +23,72 @@ def create_note(note:NoteCreated, db:Session = Depends(get_db), current_user:Use
     db.refresh(new_note)
     
     return new_note
+
+
+## this can get all the notes
+@router.get("/", response_model=List[NoteResponse])
+def get_notes(
+    db:Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    notes = db.query(Note).filter(Note.owner_id == current_user.id).all()
+    return notes
+
+##Get single NOte
+@router.get("/{id}", response_model = NoteResponse)
+def get_note(id : int, db:Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    note = db.query(Note).filter(Note.id == id, Note.owner_id == current_user.id).first()
+    
+    if not note:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Note not Found"
+        )
+        
+    return note  
+
+@router.put("/{id}", response_model = NoteResponse)
+def update_note(id:int, updated_note:NoteUpdate, db:Session = Depends(get_db), current_user:User = Depends(get_current_user)):
+        note_query = db.query(Note).filter(Note.id == id, Note.owner_id == current_user.id)
+        note = note_query.first()    
+        if not note:
+            raise HTTPException(
+                status_code = status.HTTP_404_NOT_FOUND,
+                detail = "Note not found"
+            )
+        
+        note_query.update(
+            {
+                "title": updated_note.title,
+                   "content": updated_note.content
+
+            },
+            synchronize_session = False
+        )
+        
+        db.commit()
+        return note_query.first()
+    
+@router.delete("/{id}", status_code = status.HTTP_204_NO_CONTENT)
+def delete_note(
+    id:int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    note_query = db.query(Note).filter(
+        Note.id == id,
+        Note.owner_id == current_user.id  
+    )
+    
+    note = note_query.first()
+    
+    if not note:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Note not found"
+        )
+    
+    note_query.delete(synchronize_session =False) 
+    db.commit()
+    
+    return {"Message" : f"Note with id: {id} is deleted Successfully"}
