@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Blog Platform</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen" class="auth-container">
+    <div class="auth-card">
+        <h2>Login</h2>
+        <input id="emailInput" placeholder="Email" />
+        <input id="passwordInput" type="password" placeholder="Password" />
+        <button onclick="login()">Login</button>
+        <p id="auth-msg"></p>
+    </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen" class="hidden app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <h3>My Notes</h3>
+        <button onclick="newNote()">＋ New Note</button>
+        <ul id="notes-list"></ul>
+        <button class="logout" onclick="logout()">Logout</button>
+    </aside>
+
+    <!-- EDITOR -->
+    <main class="editor">
+        <input id="noteTitle" placeholder="Note title..." />
+        <textarea id="noteContent" placeholder="Write your content here..."></textarea>
+
+        <div class="editor-actions">
+            <button onclick="saveNote()">Save</button>
+            <button onclick="loadVersions()">Versions</button>
+        </div>
+
+        <!-- COMMENTS -->
+        <section class="comments">
+            <h3>Comments</h3>
+            <textarea id="commentInput" placeholder="Write a comment..."></textarea>
+            <button onclick="postComment()">Post Comment</button>
+            <ul id="comments-list"></ul>
+        </section>
+    </main>
+
+    <!-- VERSIONS -->
+    <aside id="versions-panel" class="versions hidden">
+        <h3>Versions</h3>
+        <ul id="versions-list"></ul>
+        <button onclick="closeVersions()">Close</button>
+    </aside>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
