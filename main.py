@@ -1,27 +1,24 @@
 from fastapi import FastAPI, Depends
 from database import engine
-from models import User, Note, NoteVersion
+from models.user import User
+from models.note import Note
+from models.version import NoteVersion
+from models.comment import Comment
 
 from routers.auth import router as auth_router
 from routers.note import router as note_router
 from routers.versions import router as version_router
-
-from utils.dependencies import get_current_user
-from fastapi.middleware.cors import CORSMiddleware
-
-##admin and comment router import
 from routers.comments import router as comment_router
 from routers.admin import router as admin_router
 
+from utils.dependencies import get_current_user
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -33,10 +30,11 @@ app.include_router(admin_router)
 app.include_router(note_router)
 app.include_router(version_router)
 
-# TEMP TABLE CREATION (OK for now, Alembic already exists)
+# Create tables if they don't exist
 User.__table__.create(bind=engine, checkfirst=True)
 Note.__table__.create(bind=engine, checkfirst=True)
 NoteVersion.__table__.create(bind=engine, checkfirst=True)
+Comment.__table__.create(bind=engine, checkfirst=True)
 
 
 @app.get("/")

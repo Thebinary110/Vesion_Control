@@ -1,62 +1,277 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8" />
-    <title>Blog Platform</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Blog | Share Your Thoughts</title>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    
+    <!-- Icons (can replace with actual SVG library if needed) -->
+    <style>
+        /* Temporary Icon placeholders */
+        .icon { font-style: normal; }
+    </style>
 </head>
 <body>
 
-<!-- AUTH -->
-<div id="auth-screen" class="auth-container">
-    <div class="auth-card">
-        <h2>Login</h2>
-        <input id="emailInput" placeholder="Email" />
-        <input id="passwordInput" type="password" placeholder="Password" />
-        <button onclick="login()">Login</button>
-        <p id="auth-msg"></p>
+    <!-- APP SHELL -->
+    <div id="app" class="app-layout">
+        
+        <!-- NAVBAR -->
+        <nav id="navbar" class="navbar hidden">
+            <div class="navbar-brand">
+                <div class="navbar-brand-icon">N</div>
+                <span class="text-gradient">Nexus</span>
+            </div>
+            
+            <div class="navbar-nav">
+                <a href="#" class="navbar-link active" data-view="feed">Feed</a>
+                <a href="#" class="navbar-link" data-view="create">Write</a>
+            </div>
+
+            <div class="navbar-actions">
+                <button class="theme-toggle" id="themeBtn" title="Toggle Theme">
+                    <span>🌓</span>
+                </button>
+                
+                <div class="dropdown" id="userDropdown">
+                    <div class="avatar avatar-md" role="button">
+                        <img id="navAvatar" src="" alt="User">
+                        <div class="avatar-status avatar-status--online"></div>
+                    </div>
+                    <!-- Dropdown Menu -->
+                    <div class="dropdown-menu">
+                        <div class="dropdown-item" data-action="profile">
+                            <span>👤</span> Profile
+                        </div>
+                         <div class="dropdown-item" id="adminLink" style="display:none;" data-action="admin">
+                            <span>🛡️</span> Admin
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item" data-action="logout">
+                            <span>🚪</span> Logout
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- MAIN CONTENT AREA -->
+        <main id="main-content">
+            <!-- Content injected via JS -->
+             <div class="loading-overlay">
+                <div class="loading-spinner"></div>
+            </div>
+        </main>
+
     </div>
-</div>
 
-<!-- APP -->
-<div id="app-screen" class="hidden app-layout">
+    <!-- TEMPLATES (Hidden) -->
+    
+    <!-- LOGIN VIEW TEMPLATE -->
+    <template id="view-login">
+        <div class="auth-container animate-fadeIn">
+            <div class="glass-card auth-card gradient-border">
+                <div class="text-center" style="text-align: center; margin-bottom: 2rem;">
+                    <h1 class="text-gradient" style="margin-bottom: 0.5rem;">Welcome Back</h1>
+                    <p>Enter your details to access your account</p>
+                </div>
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <h3>My Notes</h3>
-        <button onclick="newNote()">＋ New Note</button>
-        <ul id="notes-list"></ul>
-        <button class="logout" onclick="logout()">Logout</button>
-    </aside>
+                <div class="tabs" style="margin-bottom: 1.5rem;">
+                    <button class="tab active" data-tab="login">Login</button>
+                    <button class="tab" data-tab="register">Register</button>
+                </div>
 
-    <!-- EDITOR -->
-    <main class="editor">
-        <input id="noteTitle" placeholder="Note title..." />
-        <textarea id="noteContent" placeholder="Write your content here..."></textarea>
+                <form id="authForm">
+                    <div class="input-group">
+                        <input type="email" id="email" class="input input-float" placeholder=" " required>
+                        <label for="email" class="input-label">Email Address</label>
+                    </div>
 
-        <div class="editor-actions">
-            <button onclick="saveNote()">Save</button>
-            <button onclick="loadVersions()">Versions</button>
+                    <div class="input-group">
+                        <input type="password" id="password" class="input input-float" placeholder=" " required>
+                        <label for="password" class="input-label">Password</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Continue</button>
+                </form>
+            </div>
         </div>
+    </template>
 
-        <!-- COMMENTS -->
-        <section class="comments">
-            <h3>Comments</h3>
-            <textarea id="commentInput" placeholder="Write a comment..."></textarea>
-            <button onclick="postComment()">Post Comment</button>
-            <ul id="comments-list"></ul>
-        </section>
-    </main>
+    <!-- FEED VIEW TEMPLATE -->
+    <template id="view-feed">
+        <div class="container page-feed animate-fadeIn">
+            <!-- Posts injected here -->
+        </div>
+        <div id="feed-loader" class="flex justify-center hidden" style="padding: 2rem;">
+            <div class="loading-spinner"></div>
+        </div>
+        
+        <!-- Floating Action Button for Mobile -->
+        <button class="btn btn-primary btn-icon" style="position: fixed; bottom: 20px; right: 20px; border-radius: 50%; width: 56px; height: 56px; box-shadow: var(--shadow-xl); display: none;" id="fab-create">
+            <span>➕</span>
+        </button>
+    </template>
 
-    <!-- VERSIONS -->
-    <aside id="versions-panel" class="versions hidden">
-        <h3>Versions</h3>
-        <ul id="versions-list"></ul>
-        <button onclick="closeVersions()">Close</button>
-    </aside>
+    <!-- POST VIEW TEMPLATE -->
+    <template id="view-post">
+        <article class="page-single animate-fadeIn">
+            <div class="post-hero">
+                <div class="post-hero-image">
+                    <img id="post-hero-img" src="" alt="Cover">
+                </div>
+                <div class="post-hero-overlay"></div>
+                <div class="post-hero-content container">
+                    <span class="post-hero-category">Featured</span>
+                    <h1 id="post-title" class="post-hero-title"></h1>
+                    <div class="post-hero-meta">
+                        <div class="post-author">
+                            <div class="avatar avatar-md">
+                                <img id="post-author-avatar" src="" alt="Author">
+                            </div>
+                            <div class="post-author-info">
+                                <span id="post-author-name" class="post-author-name"></span>
+                                <span id="post-date" class="post-author-date"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-</div>
+            <div class="container" style="position: relative;">
+                <!-- Reaction Bar (Floating) -->
+                <div style="position: absolute; right: 0; top: -30px;">
+                    <div class="reaction-bar glass-card">
+                         <button class="reaction-btn reaction-btn--like" title="Like">👍 <span class="reaction-count">0</span></button>
+                         <button class="reaction-btn reaction-btn--heart" title="Love">❤️ <span class="reaction-count">0</span></button>
+                    </div>
+                </div>
 
-<script src="script.js"></script>
+                <div id="post-body" class="post-content">
+                    <!-- Markdown content -->
+                </div>
+
+                <!-- Comments -->
+                <section class="comments-section" id="comments-section">
+                    <div class="comments-header">
+                        <h3 class="comments-count">Comments</h3>
+                    </div>
+                    
+                    <div class="comment-form">
+                        <div class="avatar avatar-md">
+                            <img id="comment-avatar" src="" alt="Me">
+                        </div>
+                        <div class="input-group" style="flex:1; margin-bottom: 0;">
+                            <textarea id="comment-input" class="input textarea" placeholder="What are your thoughts?" style="min-height: 100px;"></textarea>
+                            <div style="text-align: right; margin-top: 10px;">
+                                <button id="post-comment-btn" class="btn btn-primary btn-sm">Post Comment</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="comments-list" class="comment-list">
+                        <!-- Comments injected here -->
+                    </div>
+                </section>
+            </div>
+        </article>
+    </template>
+    
+    <!-- EDITOR VIEW TEMPLATE -->
+    <template id="view-editor">
+        <div class="editor-container animate-fadeInUp">
+            <div class="editor-header">
+                <input type="text" id="editor-title" class="editor-title-input" placeholder="Post Title...">
+            </div>
+            
+            <div class="editor-toolbar">
+                <button class="editor-toolbar-btn" title="Bold"><b>B</b></button>
+                <button class="editor-toolbar-btn" title="Italic"><i>I</i></button>
+                <div class="editor-toolbar-divider"></div>
+                <button class="editor-toolbar-btn" title="Image">🖼️</button>
+                <button class="editor-toolbar-btn" title="Code">{'}'}</button>
+            </div>
+
+            <textarea id="editor-content" class="input textarea editor-content" placeholder="Tell your story..."></textarea>
+            
+            <div class="editor-footer">
+                <div class="editor-status">
+                    <span class="editor-status-dot"></span>
+                    <span>Saved</span>
+                </div>
+                <div class="editor-actions">
+                    <button class="btn btn-ghost" id="cancel-edit">Cancel</button>
+                    <button class="btn btn-primary" id="publish-btn">Publish</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- ADMIN VIEW TEMPLATE -->
+    <template id="view-admin">
+        <div class="admin-layout animate-fadeIn">
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-logo text-gradient">Admin Panel</div>
+                </div>
+                <nav class="sidebar-nav">
+                    <div class="sidebar-section">
+                        <div class="sidebar-section-title">Overview</div>
+                        <a href="#" class="sidebar-link active">
+                            <span class="sidebar-link-icon">📊</span> Dashboard
+                        </a>
+                        <a href="#" class="sidebar-link">
+                            <span class="sidebar-link-icon">👥</span> Users
+                        </a>
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="admin-main">
+                <div class="admin-header">
+                    <h1 class="admin-title">Dashboard</h1>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-icon stat-card-icon--primary">📝</div>
+                        <div class="stat-card-info">
+                            <div class="stat-card-value">124</div>
+                            <div class="stat-card-label">Total Posts</div>
+                        </div>
+                    </div>
+                     <div class="stat-card">
+                        <div class="stat-card-icon stat-card-icon--success">👥</div>
+                        <div class="stat-card-info">
+                            <div class="stat-card-value" id="admin-user-count">0</div>
+                            <div class="stat-card-label">Active Users</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                        <h3 style="margin:0;">User Management</h3>
+                    </div>
+                    <div class="data-table" id="admin-users-table">
+                        <!-- Table injected here -->
+                         <div class="p-4 text-center text-muted">Loading users...</div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </template>
+
+    <!-- SCRIPTS -->
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
