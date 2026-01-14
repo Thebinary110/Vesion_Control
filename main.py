@@ -7,9 +7,28 @@ from routers.note import router as note_router
 from routers.versions import router as version_router
 
 from utils.dependencies import get_current_user
+from fastapi.middleware.cors import CORSMiddleware
+
+##admin and comment router import
+from routers.comments import router as comment_router
+from routers.admin import router as admin_router
+
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(auth_router)
+app.include_router(comment_router)
 app.include_router(auth_router)
 app.include_router(note_router)
 app.include_router(version_router)
