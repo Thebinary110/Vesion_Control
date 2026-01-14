@@ -14,6 +14,16 @@ def test_register_user(client):
 
 
 def test_login_user(client):
+    # First register the user
+    client.post(
+        "/auth/register",
+        json={
+            "email": "testuser@gmail.com",
+            "password": "strongpassword123"
+        }
+    )
+
+    # Then login
     res = client.post(
         "/auth/login",
         data={

@@ -10,7 +10,7 @@ class Note(Base):
     id = Column(Integer, primary_key = True, nullable = False)
     title = Column(String, nullable = False)
     content = Column(String, nullable = False)
-    owner_id = Column(Integer , ForeignKey("Users.id", ondelete = "CASCADE"), nullable = False)
+    owner_id = Column(Integer , ForeignKey("users.id", ondelete = "CASCADE"), nullable = False)
     comments_locked = Column(Boolean, default=False)
     created_at = Column(
         TIMESTAMP(timezone=True),

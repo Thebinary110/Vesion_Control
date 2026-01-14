@@ -1,4 +1,13 @@
-def get_token(client):
+def register_and_get_token(client):
+    """Register a user and return their access token."""
+    client.post(
+        "/auth/register",
+        json={
+            "email": "testuser@gmail.com",
+            "password": "strongpassword123"
+        }
+    )
+
     res = client.post(
         "/auth/login",
         data={
@@ -10,7 +19,7 @@ def get_token(client):
 
 
 def test_create_note(client):
-    token = get_token(client)
+    token = register_and_get_token(client)
 
     res = client.post(
         "/notes/",
@@ -28,7 +37,7 @@ def test_create_note(client):
 
 
 def test_get_notes(client):
-    token = get_token(client)
+    token = register_and_get_token(client)
 
     res = client.get(
         "/notes/",

@@ -29,7 +29,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(comment_router)
-app.include_router(auth_router)
+app.include_router(admin_router)
 app.include_router(note_router)
 app.include_router(version_router)
 
