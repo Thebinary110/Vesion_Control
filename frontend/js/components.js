@@ -3,34 +3,32 @@
  * Reusable UI component generators
  */
 
-const { createElement } = window.utils;
-
 class Components {
 
     // Post Card Component
     static createPostCard(post, onClick) {
-        return createElement('article', 'post-card animate-fadeInUp', { onclick: () => onClick(post) },
-            createElement('div', 'post-card-image', {},
-                createElement('img', '', { 
+        return window.utils.createElement('article', 'post-card animate-fadeInUp', { onclick: () => onClick(post) },
+            window.utils.createElement('div', 'post-card-image', {},
+                window.utils.createElement('img', '', { 
                     src: `https://picsum.photos/seed/${post.id}/800/450`, // Placeholder image
                     alt: post.title,
                     loading: 'lazy'
                 })
             ),
-            createElement('div', 'post-card-content', {},
-                createElement('div', 'post-card-category', {}, 'Blog'),
-                createElement('h3', 'post-card-title', {}, post.title),
-                createElement('p', 'post-card-excerpt', {}, 
+            window.utils.createElement('div', 'post-card-content', {},
+                window.utils.createElement('div', 'post-card-category', {}, 'Blog'),
+                window.utils.createElement('h3', 'post-card-title', {}, post.title),
+                window.utils.createElement('p', 'post-card-excerpt', {}, 
                     post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content
                 ),
-                createElement('div', 'post-card-footer', {},
-                    createElement('div', 'post-card-author', {},
-                        createElement('div', 'avatar avatar-xs', {}, 
-                            createElement('img', '', { src: utils.getAvatarUrl(post.owner_id) }) // Assuming owner_id can be mapped
+                window.utils.createElement('div', 'post-card-footer', {},
+                    window.utils.createElement('div', 'post-card-author', {},
+                        window.utils.createElement('div', 'avatar avatar-xs', {}, 
+                            window.utils.createElement('img', '', { src: utils.getAvatarUrl(post.owner_id) })
                         ),
-                        createElement('span', 'post-card-author-name', {}, `User ${post.owner_id}`)
+                        window.utils.createElement('span', 'post-card-author-name', {}, `User ${post.owner_id}`)
                     ),
-                    createElement('span', 'post-card-date', {}, utils.timeAgo(post.created_at || new Date()))
+                    window.utils.createElement('span', 'post-card-date', {}, utils.timeAgo(post.created_at || new Date()))
                 )
             )
         );
@@ -38,19 +36,19 @@ class Components {
 
     // Comment Component
     static createComment(comment, isOwner, onDelete) {
-        return createElement('div', 'comment animate-fadeIn', { id: `comment-${comment.id}` },
-            createElement('div', 'avatar avatar-sm', {},
-                createElement('img', '', { src: utils.getAvatarUrl(comment.user_id) })
+        return window.utils.createElement('div', 'comment animate-fadeIn', { id: `comment-${comment.id}` },
+            window.utils.createElement('div', 'avatar avatar-sm', {},
+                window.utils.createElement('img', '', { src: utils.getAvatarUrl(comment.user_id) })
             ),
-            createElement('div', 'comment-body', {},
-                createElement('div', 'comment-header', {},
-                    createElement('span', 'comment-author', {}, `User ${comment.user_id}`),
-                    createElement('span', 'comment-time', {}, utils.timeAgo(comment.created_at))
+            window.utils.createElement('div', 'comment-body', {},
+                window.utils.createElement('div', 'comment-header', {},
+                    window.utils.createElement('span', 'comment-author', {}, `User ${comment.user_id}`),
+                    window.utils.createElement('span', 'comment-time', {}, utils.timeAgo(comment.created_at))
                 ),
-                createElement('div', 'comment-content', {}, comment.content),
-                createElement('div', 'comment-actions', {},
-                    createElement('button', 'comment-action', {}, 'Reply'),
-                    isOwner ? createElement('button', 'comment-action hover-shake', { onclick: () => onDelete(comment.id) }, 'Delete') : null
+                window.utils.createElement('div', 'comment-content', {}, comment.content),
+                window.utils.createElement('div', 'comment-actions', {},
+                    window.utils.createElement('button', 'comment-action', {}, 'Reply'),
+                    isOwner ? window.utils.createElement('button', 'comment-action hover-shake', { onclick: () => onDelete(comment.id) }, 'Delete') : null
                 )
             )
         );
@@ -63,8 +61,8 @@ class Components {
 
         if (comments.length === 0) {
             list.appendChild(
-                createElement('div', 'empty-state', {},
-                    createElement('div', 'text-muted', {}, 'No comments yet. Be the first to share your thoughts!')
+                window.utils.createElement('div', 'empty-state', {},
+                    window.utils.createElement('div', 'text-muted', {}, 'No comments yet. Be the first to share your thoughts!')
                 )
             );
             return list;
@@ -80,16 +78,16 @@ class Components {
 
     // Modal Component
     static createModal(title, contentElement, onClose) {
-        const backdrop = createElement('div', 'modal-backdrop active', { onclick: (e) => {
+        const backdrop = window.utils.createElement('div', 'modal-backdrop active', { onclick: (e) => {
             if (e.target === backdrop) onClose();
         }});
 
-        const modal = createElement('div', 'modal active animate-scaleIn', {},
-            createElement('div', 'modal-header', {},
-                createElement('h3', '', {}, title),
-                createElement('button', 'btn-ghost btn-icon', { onclick: onClose }, '✕')
+        const modal = window.utils.createElement('div', 'modal active animate-scaleIn', {},
+            window.utils.createElement('div', 'modal-header', {},
+                window.utils.createElement('h3', '', {}, title),
+                window.utils.createElement('button', 'btn-ghost btn-icon', { onclick: onClose }, '✕')
             ),
-            createElement('div', 'modal-body', {}, contentElement)
+            window.utils.createElement('div', 'modal-body', {}, contentElement)
         );
 
         backdrop.appendChild(modal);
@@ -106,7 +104,7 @@ class Components {
             sad: '😢'
         };
 
-        return createElement('button', `reaction-btn reaction-btn--${type} ${active ? 'active' : ''}`, 
+        return window.utils.createElement('button', `reaction-btn reaction-btn--${type} ${active ? 'active' : ''}`, 
             { onclick: onClick, title: type },
             icons[type]
         );

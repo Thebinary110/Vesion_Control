@@ -32,7 +32,8 @@ def get_notes(
     db:Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    notes = db.query(Note).filter(Note.owner_id == current_user.id).all()
+    # Return all notes for the blog feed, ordered by creation date desc
+    notes = db.query(Note).order_by(Note.created_at.desc()).all()
     return notes
 
 ##Get single NOte

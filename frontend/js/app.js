@@ -1,7 +1,3 @@
-/**
- * Main Application Logic
- * Handles routing, view rendering, and global events
- */
 
 class App {
     constructor() {
@@ -239,9 +235,9 @@ class App {
 
         // Populate Post
         dom.getElementById('post-title').innerText = post.title;
-        dom.getElementById('post-body').innerHTML = marked.parse(post.content); // Assuming marked.js or simple text
+        dom.getElementById('post-body').innerText = post.content;
         // Fallback since we don't have a markdown parser loaded yet, just text:
-        dom.getElementById('post-body').innerText = post.content; 
+        // dom.getElementById('post-body').innerText = post.content;   
         
         dom.getElementById('post-hero-img').src = `https://picsum.photos/seed/${post.id}/1200/600`;
         dom.getElementById('post-author-name').innerText = `User ${post.owner_id}`;
@@ -262,8 +258,10 @@ class App {
         const commentAvatar = dom.getElementById('comment-avatar');
         if (commentAvatar && user) commentAvatar.src = utils.getAvatarUrl(user.email);
         
+        const commentInput = dom.getElementById('comment-input');
+        
         dom.getElementById('post-comment-btn').onclick = async () => {
-            const content = dom.getElementById('comment-input').value;
+            const content = commentInput.value;
             if(!content.trim()) return;
             
             await commentsApi.create(postId, content);
@@ -272,9 +270,12 @@ class App {
     }
 
     initEditorView(dom) {
+        const titleInput = dom.getElementById('editor-title');
+        const contentInput = dom.getElementById('editor-content');
+
         dom.getElementById('publish-btn').onclick = async () => {
-            const title = dom.getElementById('editor-title').value;
-            const content = dom.getElementById('editor-content').value;
+            const title = titleInput.value;
+            const content = contentInput.value;
 
             if(!title || !content) {
                 utils.showToast('Please fill in both title and content', 'warning');
